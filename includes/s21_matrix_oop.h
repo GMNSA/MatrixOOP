@@ -6,64 +6,151 @@
 #define SUCCESS 1
 #define FAILURE 0
 
+#include <exception>
 #include <iostream>
 
+/*! \class S21Matrix
+ *  \brief Working with matrices.
+ *
+ *  Detailed -> This class allows you to perform some operations on matrices:
+ *                  Addition of matrix A with matrix B. Subtraction of matrix B
+ *                  from matrix A. Multiplication of
+ *                  matrix A by matrix B. ...
+ */
 class S21Matrix {
 public:
   S21Matrix();
-  S21Matrix(int row_, int cols_);
+  explicit S21Matrix(int row_, int cols_);
   S21Matrix(S21Matrix const &other);
-  S21Matrix(S21Matrix const &&other);
-  S21Matrix &operator=(S21Matrix const &other_);
-  S21Matrix &operator=(S21Matrix &&other_);
-  virtual ~S21Matrix();
+  S21Matrix(S21Matrix &&other);
 
-  friend std::ostream &operator<<(std::ostream &os, S21Matrix const &other_);
-  double operator()(int row_, int col_) const;
+  ~S21Matrix();
+
+  /**
+   * @brief Checks matrices for equality among themselves.
+   *
+   * @param other -> Another matrix.
+   *
+   * @return -> (bool) True | False
+   */
+  bool EqMatrix(S21Matrix const &other) const;
+
+  /**
+   * @brief Adds the second matrix to the current one.
+   *
+   * @param other -> Another matrix.
+   */
+  void SumMatrix(S21Matrix const &other);
+
+  /**
+   * @brief Subtracts another one from the current matrix.
+   *
+   * @param other -> Another matrix.
+   */
+  void SubMatrix(S21Matrix const &other);
+
+  /**
+   * @brief Multiplies the current matrix by a number.
+   *
+   * @param num -> (double) Number.
+   */
+  void MulNumber(double const num);
+
+  /**
+   * @brief Multiplies the current matrix by the second one.
+   *
+   * @param other-> Another matrix.
+   */
+  void MulMatrix(S21Matrix const &other);
+
+  /**
+   * @brief Creates a new transposed matrix from the current one and returns it.
+   *
+   * @return -> (S21Matrix) matrix.
+   */
+  S21Matrix Transpose() const;
+
+  /**
+   * @brief Calculates and returns the determinant of the current matrix.
+   *
+   * @return  -> (double) Determinant.
+   */
+  double Determinant() const;
+
+  /**
+   * @brief Calculates the matrix of algebraic complements
+   *            ofthe current matrix and returns it.
+   *
+   * @return -> (S21Matrix) matrix.
+   */
+  S21Matrix CalcComplements() const;
+
+  /**
+   * @brief Calculates and returns the inverse matrix.
+   *
+   * @return -> (S21Matrix) matrix.
+   */
+  S21Matrix InverseMatrix() const;
+
+  /* assignment operator and move operator */
+  S21Matrix &operator=(S21Matrix const &other);
+  S21Matrix &operator=(S21Matrix &&other);
+
+  /* Overloaded operators */
+  bool operator!=(S21Matrix const &other) const;
+  bool operator==(S21Matrix const &other) const;
+  S21Matrix operator-(S21Matrix const &other) const;
+  S21Matrix &operator-=(S21Matrix const &other);
+  S21Matrix operator+(S21Matrix const &other) const;
+  S21Matrix &operator+=(S21Matrix const &other);
+  S21Matrix operator*(double const num) const;
+  S21Matrix &operator*=(double const num);
+  S21Matrix operator*(S21Matrix const &other) const;
+  S21Matrix &operator*=(S21Matrix const &other);
+
+  double &operator()(int row_, int col_) const;
   double &operator()(int row_, int col_);
 
-  bool eqMatrix(S21Matrix const &other_);
-  void sumMatrix(S21Matrix const &other_);
-  void subMatrix(S21Matrix const &other_);
-  void mulNumber(double const num_);
-  void mulMatrix(S21Matrix const &other_);
-  S21Matrix transpose();
-  double determinant();
-  S21Matrix calcComplements();
-  S21Matrix inverseMatrix();
+  /* print matrix */
+  friend std::ostream &operator<<(std::ostream &os, S21Matrix const &other);
 
-  bool operator==(S21Matrix const &other_);
-  S21Matrix operator-(S21Matrix const &other_);
-  void operator-=(S21Matrix const &other_);
-  S21Matrix operator+(S21Matrix const &other_);
-  void operator+=(S21Matrix const &other_);
-  S21Matrix operator*(double num_);
-  void operator*=(double num_);
-  S21Matrix operator*(S21Matrix const &other_);
-  void operator*=(S21Matrix const &other_);
+  /**
+   * @brief Checking the validity of the matrix.
+   *
+   * @return (bool) True | False
+   */
+  bool IsValid() const;
 
-  bool isValid() const;
-  bool resize(int row_, int col_);
-  int rows() const;
-  int cols() const;
+  /**
+   * @brief Changing the size of the matrix. (mutator)
+   *
+   * @param row -> Rows in the matrix.
+   * @param col -> Cols in the matirx.
+   *
+   * @return -> (bool) True | False
+   */
+  bool Resize(int row, int col);
 
-  void print() const;
-  std::string doubleToString(double num_);
+  /* Accessor rows_ and cols_ field */
+  int get_rows() const;
+  int get_cols() const;
 
 private:
-  double **createArrayDeep2(int rows_, int columns_);
-  double **freeArrayDeep2(double **arr_, int rows_);
-
-  void mult(int m_, int n_, int k_, S21Matrix const &a_, S21Matrix const &b_,
-            S21Matrix &c_);
-  double determinant(double **matrix_, int num_);
-  void minor(double **B_, int x_, int y_, int N_);
-  void calcComplements(S21Matrix &matrix_, int N_);
+  /* Helper functions */
+  double **CreateMatrix(int rows, int columns_) const;
+  double **FreeMatrix(double **arr, int rows) const;
+  void MulMatrix(int const rows, int const count_cols, int const cols,
+                 S21Matrix const &matrix_a, S21Matrix const &matrix_b,
+                 S21Matrix &matrix_c) const;
+  double Determinant(double **matrix_, int const num) const;
+  void Minor(double **matrix, int const x, int const y, int const count) const;
+  void CalcComplements(S21Matrix &matrix_, int const count) const;
+  void Destroy();
 
 private:
-  int m_rows;
-  int m_cols;
-  double **m_matrix;
+  int rows_;
+  int cols_;
+  double **matrix_;
 };
 
 #endif // S21_MATRIX_OOP_H_

@@ -1,6 +1,7 @@
 #ifndef TEST_MATRIX_OOP_H
 #define TEST_MATRIX_OOP_H
 
+#include "s21_matrix_oop.h"
 #include <gtest/gtest.h>
 
 class TestMatrixOOP : public ::testing::Test {
@@ -24,6 +25,9 @@ public:
 
 private:
   // put in any custom data members that you need
+  // S21Matrix matrix1;
+  // S22Matrix matrix2;
+  // S22Matrix matrix_res;
 };
 
 #endif // TEST_MATRIX_OOP_H

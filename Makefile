@@ -1,45 +1,76 @@
-CC=g++
-CFLAGS=-g -p -Wall -Wextra -Werror -std=c++17
-GCOVFLAGS:=-fprofile-arcs -ftest-coverage -fsanitize=address
-LDFLAGS:=-lcheck -lgcov -fsanitize=address
+CC=gcc
+CXXFLAGS:=-g -std=c++17 -Wall -Wextra -Werror
+GCOVFLAGS:=-ftest-coverage -fprofile-arcs
+OS:=
 
 ifeq ($(shell uname), Linux)
-LDFLAGS +=-pthread -lcheck -fsanitize=address # -lsubunit -lrt -lm 
+	LDFLAGS:=-lgcov -lpthread -lsubunit -lrt -lm
+	OS=Linux
 endif
 
-SOURCES:= srcs/s21_matrix_oop.cpp
+ifeq ($(shell uname), Darwin)
+	# LDFLAGS:=-lgcov -lpthread -fprofile-args -lm
+	OS=Darwin
+endif
+
 HEADERS_DIR:= ./includes
-HEADERS:= includes/s21_matrix_oop.h
 
-OBJECTS = $(SOURCES:.cpp=.o)
+all: s21_matrix_oop.a s21_matrix_oop_gcov.a move_lib
 
-.PHONY: all clean rebuild check
+s21_matrix_oop_gcov.a: s21_matrix_oop_gcov.o
+	@echo "create static lib gcov"
+	ar -src $@ ./gcov_obj/s21_matrix_oop_gcov.o
 
-all: s21_matrix_oop.a  move_lib
-
-#build: #test s21_matrix_oop.a 
-
-s21_matrix_oop.a: $(OBJECTS)
+s21_matrix_oop.a: s21_matrix_oop.o
 	@echo "create static lib"
-	ar -src $@ $(OBJECTS) ${HEADERS}
+	ar -src $@ ./objects/s21_matrix_oop.o
 
-test: rebuild s21_matrix_oop.a
-	./run.sh && ./tests/BUILD/bin/testMatrixOOP
+test: rebuild
+	cd ./tests && rm -rf BUILD && cmake -B ./BUILD && make -C ./BUILD
+	./test_matrix_oop # --gtest_filter=TestMatrixOOP.ForSingle
 
-.cpp.o:
-	@echo "Compiling"
-	$(CC) -g -Wall -Werror -Wextra -I ${HEADERS_DIR} -c $< -o $@
+s21_matrix_oop.o:
+	$(CC) -g $(CXXFLAGS) -I ${HEADERS_DIR} -c srcs/s21_matrix_oop.cpp -o objects/s21_matrix_oop.o
+
+s21_matrix_oop_gcov.o:
+	$(CC) -g $(CXXFLAGS) $(GCOVFLAGS) $(LDFLAGS) -I ${HEADERS_DIR} -c srcs/s21_matrix_oop.cpp -o gcov_obj/s21_matrix_oop_gcov.o
 
 move_lib:
-	mkdir -p lib && mv s21_matrix_oop.a ./lib && cp ./includes/s21_matrix_oop.h lib
+	cp ./includes/s21_matrix_oop.h ./
+	mkdir -p lib && cp s21_matrix_oop.a ./lib && cp ./includes/s21_matrix_oop.h ./lib && mv s21_matrix_oop_gcov.a ./lib
 
 rebuild: clean all
 
+gcov_report: test
+	lcov -c -d  gcov_obj/. -o gcov_obj/coverage.info
+	genhtml gcov_obj/coverage.info --output-directory out
+ifeq ($(OS), Linux)
+	firefox ./out/index.html
+else
+	open ./out/index.html
+endif
+
+
+
 clean:
-	rm -f ./a.out
+	rm -f ./test_matrix_oop
+	rm -f ./s21_matrix_oop.a
+	rm -f ./s21_matrix_oop.h
 	rm -rf ./lib
+	rm -rf ./objects/*
 	rm -rf ./tests/BUILD
 	rm -rf ./tests/Makefile
+	rm -rf ./out
+	rm -rf ./gcov_obj/*
 
 check:
-	clang-format -n ./includes/*.h ./srcs/*.cpp ./tests/includes/*.h ./tests/srcs/test_matrix_oop.cpp
+	echo "processing..."
+	./clang_custom.sh n
+	echo "~~~ $@ DONE ~~~";
+
+fix:
+	echo "processing..."
+	./clang_custom.sh i
+	echo "~~~ $@ DONE ~~~";
+
+.PHONY: all clean rebuild s21_matrix_oop.a s21_matrix_oop_gcov.a check fix test

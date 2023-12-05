@@ -1,45 +1,72 @@
 # MatrixOOP
 
-## The object-oriented approach allows you to implement a library for working with matrices in the form of a separate class, on the objects of which operations are defined, represented by both methods and standard operators +, -, *, etc.
+`S21Matrix` is a class that allows you to perform operations on matrices. The capabilities of the class include:
 
-## Matrix operations
+- Addition of matrix A with matrix B
+- Subtraction of matrix B from matrix A
+- Multiplication of matrix A by matrix B
+- Multiplication of matrix A by a number
+- Transposition of a matrix
+- Calculation of the determinant of a matrix
+- Calculation of the matrix of algebraic complements
+- Calculation of the inverse matrix
 
-There is a brief description of the matrix operations below.
+### How to Use
 
-| Operation | Description | Exceptional situations |
-| ----------- | ----------- | ----------- |
-| `bool EqMatrix(const S21Matrix& other)` | Checks matrices for equality with each other |  |
-| `void SumMatrix(const S21Matrix& other)` | Adds the second matrix to the current one | different matrix dimensions |
-| `void SubMatrix(const S21Matrix& other)` | Subtracts another matrix from the current one | different matrix dimensions |
-| `void MulNumber(const double num) ` | Multiplies the current matrix by a number |  |
-| `void MulMatrix(const S21Matrix& other)` | Multiplies the current matrix by the second matrix | the number of columns of the first matrix is not equal to the number of rows of the second matrix |
-| `S21Matrix Transpose()` | Creates a new transposed matrix from the current one and returns it |  |
-| `S21Matrix CalcComplements()` | Calculates the algebraic addition matrix of the current one and returns it | the matrix is not square |
-| `double Determinant()` | Calculates and returns the determinant of the current matrix | the matrix is not square |
-| `S21Matrix InverseMatrix()` | Calculates and returns the inverse matrix | matrix determinant is 0 |
+1. Create an object of the `S21Matrix` class, specifying the number of rows and columns of the matrix.
+    
+    ```cpp
+    S21Matrix matrix(rows, cols);
+    
+    ```
+    
+2. Perform operations on the matrix using the available methods of the class.
+    
+    ```cpp
+    matrix.SumMatrix(other); // Addition of matrices
+    matrix.SubMatrix(other); // Subtraction of matrices
+    matrix.MulMatrix(other); // Multiplication of matrices
+    matrix.MulNumber(num); // Multiplication of matrix by a number
+    matrix.Transpose(); // Transposition of the matrix
+    double determinant = matrix.Determinant(); // Calculation of the determinant of the matrix
+    S21Matrix complements = matrix.CalcComplements(); // Calculation of the matrix of algebraic complements
+    S21Matrix inverse = matrix.InverseMatrix(); // Calculation of the inverse matrix
+    
+    ```
+    
+3. Check the validity of the matrix using the `IsValid()` method.
+    
+    ```cpp
+    if (matrix.IsValid()) {
+        // Matrix is valid
+    } else {
+        // Matrix is invalid
+    }
+    
+    ```
+    
+4. Get the number of rows and columns of the matrix using the `get_rows()` and `get_cols()` methods.
+    
+    ```cpp
+    int rows = matrix.get_rows(); // Number of rows
+    int cols = matrix.get_cols(); // Number of columns
+    
+    ```
+    
 
-Apart from those operations, you also need to implement constructors and destructors:
+### Overloaded Operators
 
-| Method | Description |
-| ----------- | ----------- |
-| `S21Matrix()` | A basic constructor that initialises a matrix of some predefined dimension |  
-| `S21Matrix(int rows, int cols) ` | Parametrized constructor with number of rows and columns |
-| `S21Matrix(const S21Matrix& other)` | Copy constructor |
-| `S21Matrix(S21Matrix&& other)` | Move constructor |
-| `~S21Matrix()` | Destructor |
+The `S21Matrix` class also overloads some operators for convenience:
 
-And you also need to overload the following operators, partly corresponding to the operations above:
+- `==` and `!=` - Equality and inequality comparison of matrices
+- `+` and `` - Addition and subtraction of matrices
+- `` - Multiplication of matrix by a number or by another matrix
 
-| Operator | Description | Exceptional situations |
-| ----------- | ----------- | ----------- |
-| `+`      | Addition of two matrices | different matrix dimensions |
-| `-`   | Subtraction of one matrix from another | different matrix dimensions |
-| `*`  | Matrix multiplication and matrix multiplication by a number | the number of columns of the first matrix does not equal the number of rows of the second matrix |
-| `==`  | Checks for matrices equality (`EqMatrix`) | |
-| `=`  | Assignment of values from one matrix to another one | |
-| `+=`  | Addition assignment (`SumMatrix`) | different matrix dimensions |
-| `-=`  | Difference assignment (`SubMatrix`) | different matrix dimensions |
-| `*=`  | Multiplication assignment (`MulMatrix`/`MulNumber`) | the number of columns of the first matrix does not equal the number of rows of the second matrix |
-| `(int i, int j)`  | Indexation by matrix elements (row, column) | index is outside the matrix |
+### Printing the Matrix
 
-- c++17 gtests throw
+The matrix can be printed to the screen using the `<<` operator.
+
+```cpp
+std::cout << matrix;
+
+```
